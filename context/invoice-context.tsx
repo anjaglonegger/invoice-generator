@@ -25,10 +25,15 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const updateInvoice = (updates: Partial<InvoiceData>) => {
     const newInvoice = { ...invoice, ...updates };
 
-    if (updates.items || updates.taxRate !== undefined) {
+    if (
+      updates.items ||
+      updates.taxRate !== undefined ||
+      updates.taxExempt !== undefined
+    ) {
       const { subtotal, taxAmount, total } = calculateTotals(
         updates.items || invoice.items,
-        updates.taxRate !== undefined ? updates.taxRate : invoice.taxRate
+        updates.taxRate !== undefined ? updates.taxRate : invoice.taxRate,
+        updates.taxExempt !== undefined ? updates.taxExempt : invoice.taxExempt
       );
       newInvoice.subtotal = subtotal;
       newInvoice.taxAmount = taxAmount;
@@ -41,6 +46,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const addItem = () => {
     const newItem: InvoiceItem = {
       id: Date.now().toString(),
+      date: new Date().toISOString().split("T")[0],
       description: "",
       quantity: 1,
       rate: 0,

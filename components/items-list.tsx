@@ -10,16 +10,17 @@ export default function ItemsList() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Invoice Items</CardTitle>
+        <CardTitle>Rechnungsdetails</CardTitle>
         <Button onClick={addItem} size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          Add Item
+          Artikel hinzufügen
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
         {invoice.items.map((item, index) => (
           <InvoiceItem
             key={item.id}
+            date={item.date}
             item={item}
             index={index}
             canRemove={invoice.items.length > 1}

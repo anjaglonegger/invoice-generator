@@ -8,6 +8,7 @@ import { useInvoice } from "@/context/invoice-context";
 interface InvoiceItemProps {
   item: InvoiceItemType;
   index: number;
+  date: string;
   canRemove: boolean;
 }
 
@@ -56,18 +57,49 @@ export default function InvoiceItem({
     }
   };
 
+  // Helper function to convert yyyy-mm-dd to dd.mm.yyyy for display/storage
+  const formatDateForDisplay = (dateStr: string): string => {
+    if (!dateStr) return "";
+
+    // If in yyyy-mm-dd format, convert to dd.mm.yyyy
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = dateStr.split("-");
+      return `${day}.${month}.${year}`;
+    }
+
+    return dateStr;
+  };
+
+  const { invoice, updateInvoice } = useInvoice();
+
+  const handleDateChange = (
+    field: "date" | "periodStart" | "periodEnd",
+    value: string
+  ) => {
+    const formattedDate = formatDateForDisplay(value);
+    updateInvoice({ [field]: formattedDate });
+  };
+
   return (
     <div className="grid grid-cols-12 gap-4 p-4 border rounded-lg">
-      <div className="col-span-5">
-        <Label>Description</Label>
+      <div className="col-span-3">
+        <Label>Bezeichnung</Label>
         <Input
           placeholder="Item description"
           value={item.description}
           onChange={(e) => updateItem(index, "description", e.target.value)}
         />
       </div>
-      <div className="col-span-2">
-        <Label>Quantity</Label>
+      <div className="col-span-3">
+        <Label>Datum</Label>
+        <Input
+          id="date"
+          type="date"
+          onChange={(e) => handleDateChange("date", e.target.value)}
+        />
+      </div>
+      <div className="col-span-1">
+        <Label>Menge</Label>
         <Input
           type="number"
           min="1"
@@ -77,7 +109,7 @@ export default function InvoiceItem({
         />
       </div>
       <div className="col-span-2">
-        <Label>Rate ($)</Label>
+        <Label>Einzelpreis (€)</Label>
         <Input
           type="number"
           min="0"
@@ -88,9 +120,9 @@ export default function InvoiceItem({
         />
       </div>
       <div className="col-span-2">
-        <Label>Amount</Label>
+        <Label>Betrag</Label>
         <div className="h-10 px-3 py-2 bg-gray-50 border rounded-md flex items-center">
-          ${typeof item.amount === "number" ? item.amount.toFixed(2) : "0.00"}
+          €{typeof item.amount === "number" ? item.amount.toFixed(2) : "0.00"}
         </div>
       </div>
       <div className="col-span-1 flex items-end">

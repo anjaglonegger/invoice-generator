@@ -2,6 +2,7 @@ import { useInvoice } from "@/context/invoice-context";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Select } from "./ui/select";
 
 export default function TaxAndTotals() {
   const { invoice, updateInvoice } = useInvoice();
@@ -25,40 +26,79 @@ export default function TaxAndTotals() {
     }
   };
 
+  const handleTaxStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === "exempt") {
+      updateInvoice({ taxExempt: true, taxRate: 0 });
+    } else {
+      updateInvoice({ taxExempt: false, taxRate: 19 });
+    }
+  };
+
+  // Provide default value for taxExempt if it doesn't exist
+  const taxExempt = invoice.taxExempt || false;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tax & Totals</CardTitle>
+        <CardTitle>Steuer & Summen</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Label htmlFor="taxRate">Tax Rate (%)</Label>
-          <Input
-            id="taxRate"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value={invoice.taxRate}
-            onChange={(e) => handleTaxRateChange(e.target.value)}
-            onBlur={handleTaxRateBlur}
-          />
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="taxStatus">Umsatzsteuer-Status</Label>
+            <Select
+              id="taxStatus"
+              value={taxExempt ? "exempt" : "taxable"}
+              onChange={handleTaxStatusChange}
+            >
+              <option value="taxable">19% Umsatzsteuer</option>
+              <option value="exempt">Nicht umsatzsteuerpflichtig</option>
+            </Select>
+          </div>
+
+          {!taxExempt && (
+            <div>
+              <Label htmlFor="taxRate">Umsatzsteuer (%)</Label>
+              <Input
+                id="taxRate"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={invoice.taxRate}
+                onChange={(e) => handleTaxRateChange(e.target.value)}
+                onBlur={handleTaxRateBlur}
+              />
+            </div>
+          )}
         </div>
+
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>Subtotal:</span>
-            <span>${invoice.subtotal.toFixed(2)}</span>
+            <span>Nettobetrag</span>
+            <span>€{invoice.subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
-            <span>
-              Tax ({typeof invoice.taxRate === "number" ? invoice.taxRate : 0}
-              %):
-            </span>
-            <span>${invoice.taxAmount.toFixed(2)}</span>
-          </div>
+
+          {taxExempt ? (
+            <div className="flex justify-between text-sm">
+              <span>nicht umsatzsteuerpflichtig nach §19 UStG</span>
+              <span>€0,00</span>
+            </div>
+          ) : (
+            <div className="flex justify-between">
+              <span>
+                Umsatzsteuer (
+                {typeof invoice.taxRate === "number" ? invoice.taxRate : 0}
+                %):
+              </span>
+              <span>€{invoice.taxAmount.toFixed(2)}</span>
+            </div>
+          )}
+
           <div className="flex justify-between font-bold text-lg border-t pt-2">
-            <span>Total:</span>
-            <span>${invoice.total.toFixed(2)}</span>
+            <span>Rechnungsbetrag</span>
+            <span>€{invoice.total.toFixed(2)}</span>
           </div>
         </div>
       </CardContent>
