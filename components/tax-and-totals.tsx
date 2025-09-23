@@ -36,7 +36,7 @@ export default function TaxAndTotals() {
   };
 
   // Provide default value for taxExempt if it doesn't exist
-  const taxExempt = invoice.taxExempt || false;
+  const taxExempt = invoice.taxExempt || true;
 
   return (
     <Card>
