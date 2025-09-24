@@ -1,5 +1,6 @@
 import { InvoiceData } from "@/types/invoice";
 import { jsPDF } from "jspdf";
+import { formatDate } from "./formatters";
 
 export const generatePDF = async (invoice: InvoiceData) => {
   const doc = new jsPDF();
@@ -11,11 +12,6 @@ export const generatePDF = async (invoice: InvoiceData) => {
       style: "currency",
       currency: "EUR",
     }).format(amount);
-  };
-
-  // Helper function to format date in German format
-  const formatGermanDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("de-DE");
   };
 
   // Helper function to load image as base64 and get dimensions
@@ -65,8 +61,8 @@ export const generatePDF = async (invoice: InvoiceData) => {
     const logoWidth = logoHeight * originalAspectRatio;
 
     // Position logo in upper right corner
-    const logoX = 190 - logoWidth - 5; // 5 units margin from right edge
-    const logoY = 8;
+    const logoX = 200 - logoWidth - 5; // 5 units margin from right edge
+    const logoY = 20 - 5; // 5 units margin from top edge
 
     // Add the logo image to PDF with exact 5cm height
     doc.addImage(logoData.dataURL, "PNG", logoX, logoY, logoWidth, logoHeight);
@@ -97,14 +93,6 @@ export const generatePDF = async (invoice: InvoiceData) => {
   doc.text(invoice.toAddress, 20, y);
   y += 6;
   doc.text(invoice.toCity, 20, y);
-
-  // Invoice details table on right
-  let rightY = 70;
-  doc.text("Datum", 120, rightY);
-  doc.text(invoice.date, 150, rightY);
-  rightY += 6;
-  doc.text("Rechnung", 120, rightY);
-  doc.text(invoice.invoiceNumber, 150, rightY);
 
   // Move y position down for left content
   y += 40;
@@ -137,10 +125,14 @@ export const generatePDF = async (invoice: InvoiceData) => {
   );
   y += 15;
 
+  doc.text("Datum", 150, y);
+  doc.text(formatDate(invoice.date), 170, y);
+
   // Invoice title and number
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
   doc.text(`${invoice.invoiceNumber}`, 20, y);
+
   y += 8;
 
   doc.setFontSize(9);
@@ -173,6 +165,9 @@ export const generatePDF = async (invoice: InvoiceData) => {
   doc.setFont("helvetica", "normal");
   invoice.items.forEach((item, index) => {
     doc.text((index + 1).toString(), 20, y);
+
+    // Add the item date
+    doc.text(formatDate(item.date) || "", 30, y);
 
     // Handle long descriptions
     const description = item.description;

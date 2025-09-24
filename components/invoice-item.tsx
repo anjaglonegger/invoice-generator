@@ -72,14 +72,6 @@ export default function InvoiceItem({
 
   const { invoice, updateInvoice } = useInvoice();
 
-  const handleDateChange = (
-    field: "date" | "periodStart" | "periodEnd",
-    value: string
-  ) => {
-    const formattedDate = formatDateForDisplay(value);
-    updateInvoice({ [field]: formattedDate });
-  };
-
   return (
     <div className="grid grid-cols-12 gap-4 p-4 border rounded-lg">
       <div className="col-span-3">
@@ -95,11 +87,11 @@ export default function InvoiceItem({
         <Input
           id="date"
           type="date"
-          onChange={(e) => handleDateChange("date", e.target.value)}
+          onChange={(e) => updateItem(index, "date", e.target.value)}
         />
       </div>
       <div className="col-span-1">
-        <Label>Menge</Label>
+        <Label>Stunden</Label>
         <Input
           type="number"
           min="1"

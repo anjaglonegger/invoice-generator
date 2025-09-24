@@ -9,35 +9,38 @@ export default function BasicDetails() {
   // Helper function to convert dd.mm.yyyy to yyyy-mm-dd for HTML date input
   const formatDateForInput = (dateStr: string): string => {
     if (!dateStr) return "";
-    
+
     // If already in yyyy-mm-dd format, return as is
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return dateStr;
     }
-    
+
     // If in dd.mm.yyyy format, convert to yyyy-mm-dd
     if (dateStr.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
       const [day, month, year] = dateStr.split(".");
       return `${year}-${month}-${day}`;
     }
-    
+
     return dateStr;
   };
 
   // Helper function to convert yyyy-mm-dd to dd.mm.yyyy for display/storage
   const formatDateForDisplay = (dateStr: string): string => {
     if (!dateStr) return "";
-    
+
     // If in yyyy-mm-dd format, convert to dd.mm.yyyy
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const [year, month, day] = dateStr.split("-");
       return `${day}.${month}.${year}`;
     }
-    
+
     return dateStr;
   };
 
-  const handleDateChange = (field: 'date' | 'periodStart' | 'periodEnd', value: string) => {
+  const handleDateChange = (
+    field: "date" | "periodStart" | "periodEnd",
+    value: string
+  ) => {
     const formattedDate = formatDateForDisplay(value);
     updateInvoice({ [field]: formattedDate });
   };
@@ -61,7 +64,7 @@ export default function BasicDetails() {
           <Input
             id="date"
             type="date"
-            onChange={(e) => handleDateChange('date', e.target.value)}
+            onChange={(e) => handleDateChange("date", e.target.value)}
             value={formatDateForInput(invoice.date)}
           />
         </div>
@@ -70,7 +73,7 @@ export default function BasicDetails() {
           <Input
             id="periodStart"
             type="date"
-            onChange={(e) => handleDateChange('periodStart', e.target.value)}
+            onChange={(e) => handleDateChange("periodStart", e.target.value)}
             value={formatDateForInput(invoice.periodStart)}
           />
         </div>
@@ -79,7 +82,7 @@ export default function BasicDetails() {
           <Input
             id="periodEnd"
             type="date"
-            onChange={(e) => handleDateChange('periodEnd', e.target.value)}
+            onChange={(e) => handleDateChange("periodEnd", e.target.value)}
             value={formatDateForInput(invoice.periodEnd)}
           />
         </div>

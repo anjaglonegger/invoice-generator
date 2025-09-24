@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { useInvoice } from "@/context/invoice-context";
-import { formatDate } from "@/utils/formatters";
+import { formatDate } from "../utils/formatters";
 import { generatePDF } from "@/utils/pdf-generator";
 // import { useState } from "react";
 
@@ -50,25 +50,24 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
           <CardContent className="p-8">
             {/* Invoice Header */}
             <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">RECHNUNG</h2>
-                <p className="text-gray-600">#{invoice.invoiceNumber}</p>
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2">RECHNUNG</h2>
+                  <p className="text-gray-600">#{invoice.invoiceNumber}</p>
+                </div>
+                <div className="text-right space-y-1">
+                  <p className="text-sm text-gray-600">
+                    Datum: {formatDate(invoice.date)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Zeitraum von: {invoice.periodStart}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Zeitraum bis: {invoice.periodEnd}
+                  </p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600">
-                  Datum: {formatDate(invoice.date)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600">
-                  Zeitraum von: {formatDate(invoice.periodStart)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600">
-                  Zeitraum bis: {formatDate(invoice.periodEnd)}
-                </p>
-              </div>
+              ;
             </div>
 
             {/* From/To */}
@@ -89,6 +88,7 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
             <table className="w-full mb-8">
               <thead>
                 <tr className="border-b-2">
+                  <th className="text-left py-2">Datum</th>
                   <th className="text-left py-2">Bezeichnung</th>
                   <th className="text-center py-2">Menge</th>
                   <th className="text-right py-2">Einzelpreis</th>
@@ -98,6 +98,7 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
               <tbody>
                 {invoice.items.map((item) => (
                   <tr key={item.id} className="border-b">
+                    <td className="py-2 ">{formatDate(item.date)}</td>
                     <td className="py-2">{item.description}</td>
                     <td className="py-2 text-center">{item.quantity}</td>
                     <td className="py-2 text-right">
@@ -122,19 +123,28 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
               <div className="w-64 space-y-2">
                 <div className="flex justify-between">
                   <span>Nettobetrag</span>
-                  <span>${invoice.subtotal.toFixed(2)}</span>
+                  <span>€{invoice.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>
-                    Umsatzsteuer (
-                    {typeof invoice.taxRate === "number" ? invoice.taxRate : 0}
-                    %):
-                  </span>
-                  <span>${invoice.taxAmount.toFixed(2)}</span>
-                </div>
+                {invoice.taxExempt ? (
+                  <div className="flex justify-between text-sm">
+                    <span>nicht umsatzsteuerpflichtig nach §19 UStG</span>
+                    <span>€0,00</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between">
+                    <span>
+                      Umsatzsteuer (
+                      {typeof invoice.taxRate === "number"
+                        ? invoice.taxRate
+                        : 0}
+                      %):
+                    </span>
+                    <span>€{invoice.taxAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>Rechnugnsbetrag</span>
-                  <span>${invoice.total.toFixed(2)}</span>
+                  <span>Rechnungsbetrag</span>
+                  <span>€{invoice.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("de-DE", {
     year: "numeric",
-    month: "long",
+    month: "2-digit",
     day: "numeric",
   });
 };
